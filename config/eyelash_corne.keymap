@@ -1,5 +1,5 @@
-#define ZMK_POINTING_DEFAULT_MOVE_VAL 1200 
-#define ZMK_POINTING_DEFAULT_SCRL_VAL 25   
+#define ZMK_POINTING_DEFAULT_MOVE_VAL 1200
+#define ZMK_POINTING_DEFAULT_SCRL_VAL 25
 
 #include <input/processors.dtsi>
 #include <zephyr/dt-bindings/input/input-event-codes.h>
@@ -33,6 +33,24 @@
             #binding-cells = <0>;
             bindings = <&kp LEFT_SHIFT>, <&kp CAPS>;
         };
+
+        // 오른쪽 Shift를 누른 상태에서만 BT_CLR 실행
+        bt_CLR_SAFE: bt_CLR_SAFE {
+            compatible = "zmk,behavior-mod-morph";
+            display-name = "BT_CLR (RShift only)";
+            #binding-cells = <0>;
+            bindings = <&none>, <&bt BT_CLR>;
+            mods = <(MOD_RSFT)>;
+        };
+    };
+
+    // 넘버(1) + 심볼(2) 동시 누름 -> FUNCTION(3)
+    conditional_layers {
+        compatible = "zmk,conditional-layers";
+        tri_layer {
+            if-layers = <1 2>;
+            then-layer = <3>;
+        };
     };
 
     scroll_encoder: scroll_encoder {
@@ -60,10 +78,10 @@
         lower_layer {
             display-name = "NUMBER";
             bindings = <
-&kp TAB    &kp N1          &kp N2          &kp N3          &kp N4          &kp N5                                         &mmv MOVE_UP                     &kp N6    &kp N7    &kp N8    &kp N9    &kp N0    &kp BSPC
-&bt BT_CLR &bt BT_SEL 0    &bt BT_SEL 1    &bt BT_SEL 2    &bt BT_SEL 3    &bt BT_SEL 4                   &mmv MOVE_LEFT  &mkp LCLK       &mmv MOVE_RIGHT  &kp LEFT  &kp DOWN  &kp UP    &kp RIGHT &none     &none
-&kp LCTRL  &none           &none           &none           &none           &none           &kp C_MUTE                     &mmv MOVE_DOWN                   &none     &none     &none     &none     &none     &none
-                                           &kp LGUI        &kp ENTER       &trans                                                                          &none     &kp SPACE &kp RALT
+&kp TAB        &kp N1          &kp N2          &kp N3          &kp N4          &kp N5                                         &mmv MOVE_UP                     &kp N6    &kp N7    &kp N8    &kp N9    &kp N0    &kp BSPC
+&bt_CLR_SAFE   &none    &none    &none    &none    &kp CAPS                   &mmv MOVE_LEFT  &mkp LCLK       &mmv MOVE_RIGHT  &kp LEFT  &kp RIGHT  &kp UP    &kp DOWN &none     &kp RSHFT
+&kp LCTRL      &kp LALT           &none           &none           &none           &kp SPACE           &kp C_MUTE                     &mmv MOVE_DOWN                   &bt BT_SEL 0     &bt BT_SEL 1     &bt BT_SEL 2     &bt BT_SEL 3     &bt BT_SEL 4     &none
+                                               &kp LGUI        &kp ENTER       &trans                                                                          &none     &kp SPACE &kp RALT
             >;
 
             sensor-bindings = <&scroll_encoder>;
@@ -72,10 +90,22 @@
         raise_layer {
             display-name = "SYMBOL";
             bindings = <
-&kp TAB    &kp EXCL      &kp AT        &kp HASH      &kp DLLR      &kp PRCNT                                      &mmv MOVE_UP                     &kp CARET  &kp AMPS   &kp ASTRK  &kp LPAR  &kp RPAR  &kp BSPC
-&kp LSHFT  &none         &none         &none         &none         &none                          &mmv MOVE_LEFT  &mkp LCLK       &mmv MOVE_RIGHT  &kp MINUS  &kp EQUAL  &kp LBKT   &kp RBKT  &kp BSLH  &kp GRAVE
-&kp LCTRL  &none         &none         &none         &none         &none           &trans                         &mmv MOVE_DOWN                   &kp UNDER  &kp PLUS   &kp LBRC   &kp RBRC  &kp PIPE  &kp TILDE
-                                       &kp LGUI      &kp ENTER     &none                                                                           &trans     &kp SPACE  &kp RALT
+&kp TAB    &kp EXCL      &kp AT        &kp HASH      &kp DLLR      &kp PRCNT                                      &mmv MOVE_UP                     &kp CARET  &kp AMPS   &kp ASTRK  &kp LPAR  &kp RPAR  &kp DEL
+&kp LSHFT  &kp PSCRN         &kp SLCK         &kp PAUSE_BREAK         &none         &none                          &mmv MOVE_LEFT  &mkp LCLK       &mmv MOVE_RIGHT  &kp MINUS  &kp EQUAL  &kp LBKT   &kp RBKT  &kp BSLH  &kp GRAVE
+&kp LCTRL  &kp INS         &kp HOME         &kp END         &none         &none           &kp C_MUTE                         &mmv MOVE_DOWN                   &kp UNDER  &kp PLUS   &kp LBRC   &kp RBRC  &kp PIPE  &kp TILDE
+                                       &kp LGUI      &kp ENTER     &none                                                                           &trans     &kp SPACE  &kp RCTRL
+            >;
+
+            sensor-bindings = <&scroll_encoder>;
+        };
+
+        function_layer {
+            display-name = "FUNCTION";
+            bindings = <
+&none  &kp F1       &kp F2        &kp F3      &kp F4      &kp F5                                   &mmv MOVE_UP                                       &kp F6        &kp F7       &kp F8      &kp F9    &kp F10    &none
+&none  &none      &none      &none     &none     &kp F11               &mmv MOVE_LEFT    &mkp LCLK      &mmv MOVE_RIGHT       &kp F12     &none     &none      &none       &none       &none
+&none  &none      &none       &none     &none   &none        &kp C_MUTE               &mmv MOVE_DOWN                                      &none      &none    &none     &none      &none      &none
+                                   &kp LGUI        &kp ENTER       &trans                                                       &trans     &kp SPACE  &kp RCTRL
             >;
 
             sensor-bindings = <&scroll_encoder>;
