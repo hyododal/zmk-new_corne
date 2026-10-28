@@ -95,7 +95,7 @@ layers:
   - LGUI
   - {t: '$$mdi:keyboard-return$$', type: enter}
   - {type: held}
-  - {t: '$$mdi:minus-circle-outline$$', type: none}
+  - SYMBOL
   - $$mdi:keyboard-space$$
   - $$mdi:apple-keyboard-option$$
   SYMBOL:
@@ -143,7 +143,7 @@ layers:
   - '~'
   - LGUI
   - {t: '$$mdi:keyboard-return$$', type: enter}
-  - {t: '$$mdi:minus-circle-outline$$', type: none}
+  - {t: NUMBER, type: held alternate}
   - {type: held}
   - $$mdi:keyboard-space$$
   - $$mdi:apple-keyboard-control$$
